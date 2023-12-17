@@ -1,8 +1,10 @@
-const { app, BrowserWindow } = require("electron");
+const { app, Menu, Tray, BrowserWindow } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const createWindow = () => {
+app.commandLine.appendSwitch("disable-hid-blocklist");
+
+app.whenReady().then(() => {
   const window = new BrowserWindow({
     width: 1200,
     height: 900,
@@ -24,14 +26,21 @@ const createWindow = () => {
   })
 
   window.loadURL("https://drunkdeer-antler.com/#/");
-}
 
-app.commandLine.appendSwitch("disable-hid-blocklist");
+  const tray = new Tray(path.join(__dirname, "icon.png"));
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "show window", click: () => { window.show(); } },
+    { label: "quit", click: () => { app.quit(); } }
+  ]);
+  tray.setToolTip("DrunkDeer Antler");
+  tray.setContextMenu(contextMenu);
 
-app.whenReady().then(() => {
-  createWindow();
+  window.on('close', function (event) {
+    event.preventDefault();
+    window.hide();
+  });
 
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  tray.on('click', function () {
+    window.show();
   });
 });

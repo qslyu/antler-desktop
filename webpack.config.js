@@ -1,7 +1,6 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'development',
   entry: './react-src/panel.jsx',
   target: 'electron-renderer',
   output: {
